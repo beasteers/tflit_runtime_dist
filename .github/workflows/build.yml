@@ -6,7 +6,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        branch: [r2.0]  # r2.1,
+        branch: [master]  # r2.1,
         python: [3.5, 3.6, 3.7, 3.8]
         os: [macos-latest, ubuntu-latest]  # , windows-latest
 
@@ -48,10 +48,18 @@ jobs:
           echo $f $f2
           mv "$f" "$f2"
         done
-    - name: Publish package to TestPyPI
-      uses: pypa/gh-action-pypi-publish@master
+    - name: change linux to manylinux2014
+      run: |
+        git add dist/*
+        git commit -m 'adding whl for ${{ matrix.os }}:${{ matrix.python }}'
+    - name: Push changes
+      uses: ad-m/github-push-action@master
       with:
-        user: ${{ secrets.pypi_user }}
-        password: ${{ secrets.pypi_password }}
-        repository_url: https://test.pypi.org/simple
-        skip_existing: true
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+    # - name: Publish package to TestPyPI
+    #   uses: pypa/gh-action-pypi-publish@master
+    #   with:
+    #     user: ${{ secrets.pypi_user }}
+    #     password: ${{ secrets.pypi_password }}
+    #     repository_url: https://test.pypi.org/simple
+    #     skip_existing: true

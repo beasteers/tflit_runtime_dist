@@ -96,5 +96,5 @@ jobs:
         with:
           user: ${{ secrets.pypi_user }}
           password: ${{ secrets.pypi_password }}
-          repository_url: https://test.pypi.org/simple
+          repository_url: https://test.pypi.org/simple/
           skip_existing: true

@@ -18,7 +18,7 @@ jobs:
     - name: Clone
       run: |
         git clone https://github.com/tensorflow/tensorflow.git
-        git checkout ${{ matrix.branch }}
+        git -C tensorflow checkout ${{ matrix.branch }}
 
     - name: Platform Installs | Linux
       if: startsWith(matrix.os, 'ubuntu')

@@ -45,6 +45,7 @@ jobs:
       run: |
         pwd
         ls
+        find / -name "tflite_runtime*.whl" | wc -l
     # - name: change linux to manylinux2014
     #   run: |
     #     for f in dist/*; do

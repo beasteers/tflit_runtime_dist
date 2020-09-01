@@ -45,8 +45,8 @@ jobs:
       run: |
         pwd
         ls
-        find /tmp/tflite_pip ./tensorflow/tensorflow/lite -type f -name "tflite_runtime*.whl"
-        FILES=$(find /tmp/tflite_pip ./tensorflow/tensorflow/lite -type f -name "tflite_runtime*.whl" 2&>/dev/null | grep -v "Permission Denied")
+        find /tmp/tflite_pip ./tensorflow/tensorflow/lite -type f -name "tflite_runtime*.whl" 2>/dev/null || :
+        FILES=$(find /tmp/tflite_pip ./tensorflow/tensorflow/lite -type f -name "tflite_runtime*.whl" 2&>/dev/null || :)
         echo $FILES
         for f in $FILES; do
           f2=dist/$(basename "$f" | sed -e 's/linux/manylinux2014/g')

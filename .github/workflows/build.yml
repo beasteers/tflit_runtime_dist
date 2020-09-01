@@ -1,0 +1,32 @@
+on: push
+name: Compile
+jobs:
+  build:
+    name: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        python: [3.4, 3.5, 3.6, 3.7, 3.8]
+        os: [macos-latest, windows-latest, ubuntu-18.04]
+
+    steps:
+    - uses: actions/setup-python@v1
+      with:
+        python-version: ${{ matrix.python }}
+    - name: Build
+      run: |
+        git checkout https://github.com/tensorflow/tensorflow.git
+        sudo apt install swig libjpeg-dev zlib1g-dev
+        pip install numpy pybind11
+        sh tensorflow/lite/tools/make/download_dependencies.sh
+        sh tensorflow/lite/tools/pip_package/build_pip_package.sh
+
+    - name: show
+      run: ls * */*
+    # - name: Publish package to TestPyPI
+    #   uses: pypa/gh-action-pypi-publish@master
+    #   with:
+    #     user: ${{ secrets.pypi_user }}
+    #     password: ${{ secrets.pypi_password }}
+    #     repository_url: testpypi #https://test.pypi.org/legacy/
+    #     skip_existing: true

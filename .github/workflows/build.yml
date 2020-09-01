@@ -33,7 +33,7 @@ jobs:
 
     - name: Installs
       run: |
-        pip install numpy pybind11
+        pip install numpy pybind11 wheel
     - name: Build
       run: |
         /bin/bash tensorflow/tensorflow/lite/tools/make/download_dependencies.sh

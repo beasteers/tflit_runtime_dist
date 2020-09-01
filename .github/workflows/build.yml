@@ -17,8 +17,8 @@ jobs:
 
     - name: Clone
       run: |
-        git clone https://github.com/tensorflow/tensorflow.git
-        git -C tensorflow checkout ${{ matrix.branch }}
+        git clone https://github.com/tensorflow/tensorflow.git ../tensorflow
+        git -C ../tensorflow checkout ${{ matrix.branch }}
 
     - name: Platform Installs | Linux
       if: startsWith(matrix.os, 'ubuntu')
@@ -30,17 +30,15 @@ jobs:
       run: |
         brew install swig libjpeg
 
-    # - name: Platform Installs | Mac
-    #   run: |
-    #     brew install swig libjpeg
-
     - name: Installs
       run: |
         pip install numpy pybind11 wheel
+
+
     - name: Build
       run: |
-        /bin/bash tensorflow/tensorflow/lite/tools/make/download_dependencies.sh
-        /bin/bash tensorflow/tensorflow/lite/tools/pip_package/build_pip_package.sh
+        /bin/bash ../tensorflow/tensorflow/lite/tools/make/download_dependencies.sh
+        /bin/bash ../tensorflow/tensorflow/lite/tools/pip_package/build_pip_package.sh
 
     - uses: actions/checkout@master
 
@@ -48,8 +46,7 @@ jobs:
       run: |
         pwd
         ls -lah
-        find /tmp/tflite_pip ./tensorflow/tensorflow/lite -type f -name "tflite_runtime*.whl" 2>/dev/null || :
-        FILES=$(find /tmp/tflite_pip ./tensorflow/tensorflow/lite -type f -name "tflite_runtime*.whl" 2&>/dev/null || :)
+        FILES=$(find /tmp/tflite_pip ../tensorflow/tensorflow/lite -name "tflite_runtime*.whl" 2>/dev/null || :)
         echo 55555 $FILES
         mkdir -p dist
         for f in $FILES; do

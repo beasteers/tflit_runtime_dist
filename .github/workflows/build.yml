@@ -41,14 +41,18 @@ jobs:
       run: |
         /bin/bash tensorflow/tensorflow/lite/tools/make/download_dependencies.sh
         /bin/bash tensorflow/tensorflow/lite/tools/pip_package/build_pip_package.sh
-    - name: change linux to manylinux2014
+    - name: ls
       run: |
-        for f in dist/*; do
-          f2=$(sed -i -e 's/linux/manylinux2014/g' "$f")
-          echo $f $f2
-          mv "$f" "$f2"
-        done
-    - name: change linux to manylinux2014
+        pwd
+        ls
+    # - name: change linux to manylinux2014
+    #   run: |
+    #     for f in dist/*; do
+    #       f2=$(sed -i -e 's/linux/manylinux2014/g' "$f")
+    #       echo $f $f2
+    #       mv "$f" "$f2"
+    #     done
+    - name: commit files
       run: |
         git add dist/*
         git commit -m 'adding whl for ${{ matrix.os }}:${{ matrix.python }}'

@@ -6,9 +6,13 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        branch: [master]  # r2.1,
-        python: [3.5, 3.6, 3.7, 3.8] #
-        os: [macos-latest, ubuntu-latest]  # , windows-latest
+        branch: [master]
+        python: [3.7]
+        os: [ubuntu-latest]
+        # branch: [r2.1, r2.2, r2.3]  # r2.1,
+        # python: [3.5, 3.6, 3.7, 3.8] #
+        # os: [macos-latest, ubuntu-latest]  #
+        version_suffix: [.testtestest]
 
     steps:
     - uses: actions/setup-python@v1
@@ -22,23 +26,22 @@ jobs:
 
     - name: Platform Installs | Linux
       if: startsWith(matrix.os, 'ubuntu')
-      run: |
-        sudo apt-get install swig libjpeg-dev zlib1g-dev -y
+      run: sudo apt-get install swig libjpeg-dev zlib1g-dev -y
 
     - name: Platform Installs | Mac
       if: startsWith(matrix.os, 'macos')
-      run: |
-        brew install swig libjpeg
+      run: brew install swig libjpeg
 
     - name: Installs
-      run: |
-        pip install numpy pybind11 wheel
+      run: pip install numpy pybind11 wheel
 
 
     - name: Build
       run: |
         /bin/bash ../tensorflow/tensorflow/lite/tools/make/download_dependencies.sh
         /bin/bash ../tensorflow/tensorflow/lite/tools/pip_package/build_pip_package.sh
+      env:
+        VERSION_SUFFIX: ${{ matrix.version_suffix }}
 
     - uses: actions/checkout@master
 

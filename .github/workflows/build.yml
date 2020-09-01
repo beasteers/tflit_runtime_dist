@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         python: [3.5, 3.6, 3.7, 3.8]
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [macos-latest, ubuntu-latest]  # , windows-latest
 
     steps:
     - uses: actions/setup-python@v1
@@ -16,15 +16,28 @@ jobs:
 
     - name: Clone
       run: git clone https://github.com/tensorflow/tensorflow.git
+
+    - name: Platform Installs | Linux
+      if: startsWith(matrix.os, 'ubuntu')
+      run: |
+        apt-get install swig libjpeg-dev zlib1g-dev -y
+
+    - name: Platform Installs | Mac
+      if: startsWith(matrix.os, 'macos')
+      run: |
+        brew install swig libjpeg
+
+    # - name: Platform Installs | Mac
+    #   run: |
+    #     brew install swig libjpeg
+
     - name: Installs
       run: |
-        sudo apt-get install swig libjpeg-dev zlib1g-dev -y
-        python -m pip install --upgrade pip
         pip install numpy pybind11
     - name: Build
       run: |
-        sh tensorflow/tensorflow/lite/tools/make/download_dependencies.sh
-        sh tensorflow/tensorflow/lite/tools/pip_package/build_pip_package.sh
+        /bin/bash tensorflow/tensorflow/lite/tools/make/download_dependencies.sh
+        /bin/bash tensorflow/tensorflow/lite/tools/pip_package/build_pip_package.sh
         rm -r tensorflow
     - name: show
       run: ls * */*

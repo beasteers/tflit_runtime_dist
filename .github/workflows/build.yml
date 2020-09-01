@@ -20,7 +20,7 @@ jobs:
     - name: Platform Installs | Linux
       if: startsWith(matrix.os, 'ubuntu')
       run: |
-        apt-get install swig libjpeg-dev zlib1g-dev -y
+        sudo apt-get install swig libjpeg-dev zlib1g-dev -y
 
     - name: Platform Installs | Mac
       if: startsWith(matrix.os, 'macos')

@@ -6,6 +6,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        branch: [r2.0]  # r2.1,
         python: [3.5, 3.6, 3.7, 3.8]
         os: [macos-latest, ubuntu-latest]  # , windows-latest
 
@@ -15,7 +16,9 @@ jobs:
         python-version: ${{ matrix.python }}
 
     - name: Clone
-      run: git clone https://github.com/tensorflow/tensorflow.git
+      run: |
+        git clone https://github.com/tensorflow/tensorflow.git
+        git checkout ${{ matrix.branch }}
 
     - name: Platform Installs | Linux
       if: startsWith(matrix.os, 'ubuntu')
@@ -38,13 +41,17 @@ jobs:
       run: |
         /bin/bash tensorflow/tensorflow/lite/tools/make/download_dependencies.sh
         /bin/bash tensorflow/tensorflow/lite/tools/pip_package/build_pip_package.sh
-        rm -r tensorflow
-    - name: show
-      run: ls * */*
-    # - name: Publish package to TestPyPI
-    #   uses: pypa/gh-action-pypi-publish@master
-    #   with:
-    #     user: ${{ secrets.pypi_user }}
-    #     password: ${{ secrets.pypi_password }}
-    #     repository_url: testpypi #https://test.pypi.org/legacy/
-    #     skip_existing: true
+    - name: change linux to manylinux2014
+      run: |
+        for f in dist/*; do
+          f2=$(sed -i -e 's/linux/manylinux2014/g' "$f")
+          echo $f $f2
+          mv "$f" "$f2"
+        done
+    - name: Publish package to TestPyPI
+      uses: pypa/gh-action-pypi-publish@master
+      with:
+        user: ${{ secrets.pypi_user }}
+        password: ${{ secrets.pypi_password }}
+        repository_url: https://test.pypi.org/simple
+        skip_existing: true

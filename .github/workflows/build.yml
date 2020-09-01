@@ -48,11 +48,17 @@ jobs:
         find /tmp/tflite_pip ./tensorflow/tensorflow/lite -type f -name "tflite_runtime*.whl" 2>/dev/null || :
         FILES=$(find /tmp/tflite_pip ./tensorflow/tensorflow/lite -type f -name "tflite_runtime*.whl" 2&>/dev/null || :)
         echo $FILES
+        mkdir -p dist
         for f in $FILES; do
           f2=dist/$(basename "$f" | sed -e 's/linux/manylinux2014/g')
           echo $f $f2
           mv "$f" "$f2"
         done
+
+
+    # push github
+
+    - uses: actions/checkout@master
     - name: commit files
       run: |
         git add dist/*

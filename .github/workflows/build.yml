@@ -7,7 +7,7 @@ jobs:
     strategy:
       matrix:
         branch: [master]  # r2.1,
-        python: [3.7] # 3.5, 3.6, , 3.8
+        python: [3.5, 3.6, 3.7, 3.8] # 
         os: [macos-latest, ubuntu-latest]  # , windows-latest
 
     steps:
@@ -64,6 +64,7 @@ jobs:
         git config --global user.name "Bea Steers"
         git add dist/
         git commit -m 'adding whl for ${{ matrix.os }}:${{ matrix.python }}'
+        git pull
     - name: Push changes
       uses: ad-m/github-push-action@master
       with:

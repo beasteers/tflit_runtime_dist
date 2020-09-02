@@ -26,7 +26,7 @@ install_tflite_build_deps() {
     else
         brew install swig libjpeg
     fi
-    pip3 install numpy pybind11 wheel
+    pip3 install numpy pybind11 wheel setuptools --upgrade
 }
 # build
 

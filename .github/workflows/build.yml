@@ -74,6 +74,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:  # how to DRY?
+        fail-fast: false
         branch: [master]
         python: [3.7]
         # branch: [r2.1, r2.2, r2.3]  # r2.1,

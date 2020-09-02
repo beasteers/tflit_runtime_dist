@@ -84,6 +84,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1
+        with:
+          python-version: ${{ matrix.python }}
+
       - name: Make ${{ matrix.arch }} wheel
         run: |
           sudo apt-get install g++-arm-linux-gnueabihf g++-aarch64-linux-gnu

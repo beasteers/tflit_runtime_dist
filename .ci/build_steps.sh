@@ -93,27 +93,19 @@ test_tflite_runtime() {
 # main
 
 run_full_tflite_build() {
-    clone_tensorflow
-    install_tflite_build_deps
-    build_tflite_runtime
-    gather_tflite_wheels
-    upload_to_testpypi
+    clone_tensorflow && install_tflite_build_deps && build_tflite_runtime \
+        && gather_tflite_wheels && upload_to_testpypi
 }
 
 run_tflite_build_setup() {
-    clone_tensorflow
-    install_tflite_build_deps
+    clone_tensorflow && install_tflite_build_deps
 }
 
 run_tflite_setup_and_build() {
-    clone_tensorflow
-    install_tflite_build_deps
-    build_tflite_runtime
-    gather_tflite_wheels
+    clone_tensorflow && install_tflite_build_deps && build_tflite_runtime \
+        && gather_tflite_wheels
 }
 
 run_tflite_build_and_upload() {
-    build_tflite_runtime
-    gather_tflite_wheels
-    upload_to_testpypi
+    build_tflite_runtime && gather_tflite_wheels && upload_to_testpypi
 }

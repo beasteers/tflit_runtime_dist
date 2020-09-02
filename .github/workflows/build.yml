@@ -34,6 +34,9 @@ jobs:
   #
   #     - name: Clone
   #       run: . .ci/build_steps.sh && clone_tensorflow
+  #       env:
+  #         TF_BRANCH: ${{ matrix.python }}
+  #
   #     - name: Installs
   #       run: . .ci/build_steps.sh && install_tflite_build_deps
   #
@@ -75,24 +78,17 @@ jobs:
         python: [3.7]
         # branch: [r2.1, r2.2, r2.3]  # r2.1,
         # python: [3.5, 3.6, 3.7, 3.8] #
-        arch: [arm32v7] #, arm64v8
+        arch: [rpi, aarch64] #, arm64v8
         version_suffix: [.dev800] #[''] #
         package_name: [tflite-runtime-alt]
 
     steps:
       - uses: actions/checkout@v1
-      - name: Make ${{ matrix.docker_images }} wheel
-        run: |
-          . .ci/build_steps.sh
-
-          docker build -f .ci/Dockerfile.arm -t tflite_runtime_arm_build \
-            --build-arg py_version="${{ matrix.python }}" \
-            --build-arg arch="${{ matrix.arch }}" .
-
-          docker run --rm -v dist:dist \
-            -e TF_BRANCH=${{ matrix.branch }} \
-            -e PKG_NAME=${{ matrix.package_name }} \
-            -e VERSION_SUFFIX=${{ matrix.version_suffix }} \
-            -e TWINE_USERNAME=${{ secrets.pypi_user }} \
-            -e TWINE_PASSWORD=${{ secrets.pypi_password }} \
-            tflite_runtime_arm_build run_full_tflite_build
+      - name: Make ${{ matrix.arch }} wheel
+        run: . .ci/build_steps.sh && run_full_tflite_build
+        env:
+          TENSORFLOW_TARGET: ${{ matrix.arch }}
+          VERSION_SUFFIX: ${{ matrix.version_suffix }}
+          PKG_NAME: ${{ matrix.package_name }}
+          TWINE_USERNAME: ${{ secrets.pypi_user }}
+          TWINE_PASSWORD: ${{ secrets.pypi_password }}

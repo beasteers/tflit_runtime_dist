@@ -60,10 +60,10 @@ jobs:
           cat   ../tensorflow/tensorflow/lite/tools/pip_package/setup.py
       #     /bin/bash ../tensorflow/tensorflow/lite/tools/make/download_dependencies.sh
       #     /bin/bash ../tensorflow/tensorflow/lite/tools/pip_package/build_pip_package.sh
-      #   env:
-      #     VERSION_SUFFIX: ${{ matrix.version_suffix }}
-      #     PKG_NAME: ${{ matrix.package_name }}
-      #
+        env:
+          VERSION_SUFFIX: ${{ matrix.version_suffix }}
+          PKG_NAME: ${{ matrix.package_name }}
+
       # # gather files
       #
       # - name: copy over wheels

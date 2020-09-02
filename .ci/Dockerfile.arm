@@ -1,0 +1,8 @@
+ARG arch=arm32v7
+ARG py_version=3.7
+FROM $arch/python:$py_version
+
+WORKDIR /src/tflite_runtime
+COPY .ci/build_steps.sh .
+RUN . build_steps.sh && clone_tensorflow
+ENTRYPOINT ['bash', '-c', '. build_steps.sh && "$@"']

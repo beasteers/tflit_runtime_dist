@@ -9,114 +9,90 @@
 on: push
 name: Compile
 jobs:
-  build:
-    name: Build
-    runs-on: ${{ matrix.os }}
+  # build:
+  #   name: Build
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     matrix:
+  #       # branch: [master]
+  #       # python: [3.7]
+  #       # os: [ubuntu-latest]
+  #       branch: [r2.1, r2.2, r2.3]  # r2.1,
+  #       python: [3.5, 3.6, 3.7, 3.8] #
+  #       os: [macos-latest, ubuntu-latest]  #
+  #       version_suffix: [.dev801] #[''] #
+  #       package_name: [tflite-runtime-alt]
+  #
+  #   steps:
+  #
+  #     # Setup
+  #
+  #     - uses: actions/checkout@master
+  #     - uses: actions/setup-python@v1
+  #       with:
+  #         python-version: ${{ matrix.python }}
+  #
+  #     - name: Clone
+  #       run: . .ci/build_steps.sh && clone_tensorflow
+  #     - name: Installs
+  #       run: . .ci/build_steps.sh && install_tflite_build_deps
+  #
+  #     - name: Build
+  #       run: . .ci/build_steps.sh && build_tflite_runtime
+  #       env:
+  #         VERSION_SUFFIX: ${{ matrix.version_suffix }}
+  #         PKG_NAME: ${{ matrix.package_name }}
+  #
+  #     - name: copy over wheels
+  #       run: . .ci/build_steps.sh && gather_tflite_wheels
+  #
+  #     # # push github
+  #     # - name: commit files
+  #     #   run: . .ci/build_steps.sh && push_wheels_to_github
+  #     #   env:
+  #     #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #     #     PY_VERSION: ${{ matrix.python }}
+  #     #     OS_NAME: ${{ matrix.os }}
+  #
+  #     - name: pypi upload
+  #       run: . .ci/build_steps.sh && upload_to_testpypi
+  #       env:
+  #         TWINE_USERNAME: ${{ secrets.pypi_user }}
+  #         TWINE_PASSWORD: ${{ secrets.pypi_password }}
+  #
+  #     # - name: Tests
+  #     #   run: . .ci/build_steps.sh && test_tflite_runtime
+  #     #   env:
+  #     #     TFRUNTIME_VERSION:   # XXX: how to get version???
+
+
+  build_arm:
+    name: Build ARM 32/64
+    runs-on: ubuntu-latest
     strategy:
-      matrix:
-        # branch: [master]
-        # python: [3.7]
-        # os: [ubuntu-latest]
-        branch: [r2.1, r2.2, r2.3]  # r2.1,
-        python: [3.5, 3.6, 3.7, 3.8] #
-        os: [macos-latest, ubuntu-latest]  #
-        version_suffix: [.dev800]
+      matrix:  # how to DRY?
+        branch: [master]
+        python: [3.7]
+        # branch: [r2.1, r2.2, r2.3]  # r2.1,
+        # python: [3.5, 3.6, 3.7, 3.8] #
+        arch: [arm32v7] #, arm64v8
+        version_suffix: [.dev800] #[''] #
         package_name: [tflite-runtime-alt]
 
     steps:
-
-      # Setup
-
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v1
-        with:
-          python-version: ${{ matrix.python }}
-
-      - name: Clone
+      - uses: actions/checkout@v1
+      - name: Make ${{ matrix.docker_images }} wheel
         run: |
-          git clone https://github.com/tensorflow/tensorflow.git ../tensorflow
-          git -C ../tensorflow checkout ${{ matrix.branch }}
+          . .ci/build_steps.sh
 
-      # install
+          docker build -f .ci/Dockerfile.arm -t tflite_runtime_arm_build \
+            --build-arg py_version="${{ matrix.python }}" \
+            --build-arg arch="${{ matrix.arch }}" .
 
-      - name: Platform Installs | Linux
-        if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get install swig libjpeg-dev zlib1g-dev -y
-
-      - name: Platform Installs | Mac
-        if: startsWith(matrix.os, 'macos')
-        run: brew install swig libjpeg
-
-      - name: Installs
-        run: pip install numpy pybind11 wheel
-
-      # build
-
-      - name: Build
-        run: |
-          # change package name
-          # sed -i -e "s/PACKAGE_NAME = [\'\"]tflite[_-]runtime[\'\"]/PACKAGE_NAME = \"${PKG_NAME}\"/" \
-          #   ../tensorflow/tensorflow/lite/tools/pip_package/setup.py
-          sed -i -e "s/ name=PACKAGE_NAME/ name=\"${PKG_NAME}\"/" \
-            ../tensorflow/tensorflow/lite/tools/pip_package/setup.py
-
-          /bin/bash ../tensorflow/tensorflow/lite/tools/make/download_dependencies.sh
-          /bin/bash ../tensorflow/tensorflow/lite/tools/pip_package/build_pip_package.sh
-        env:
-          VERSION_SUFFIX: ${{ matrix.version_suffix }}
-          PKG_NAME: ${{ matrix.package_name }}
-
-      # gather files
-
-      - name: copy over wheels
-        run: |
-          pwd
-          FILES=$(find /tmp/tflite_pip ../tensorflow/tensorflow/lite -name "tflite_runtime*.whl" 2>/dev/null || :)
-          echo 'Found:' $FILES
-
-          mkdir -p dist
-          for f in $FILES; do
-            f2=dist/$(basename "$f" | sed -e 's/linux/manylinux2014/g')
-            mv "$f" "$f2"
-          done
-
-          ls -lah
-          ls -lah dist/
-
-      # push github
-      # - name: commit files
-      #   run: |
-      #     git config --global user.email "bea.steers@gmail.com"
-      #     git config --global user.name "Bea Steers"
-      #     git add dist/
-      #     git commit -m 'adding whl for ${{ matrix.os }}:${{ matrix.python }}'
-      #
-      #     #  https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${REPOSITORY}.git
-      #     for i in {1..5}; do
-      #        git pull && git push && break
-      #        sleep $((1 + $RANDOM % 4))
-      #     done
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: pypi upload
-        run: |
-          pip install twine
-          twine check dist/*
-          twine upload --skip-existing --repository testpypi dist/*
-        env:
-          TWINE_USERNAME: ${{ secrets.pypi_user }}
-          TWINE_PASSWORD: ${{ secrets.pypi_password }}
-
-      # - name: Publish package to TestPyPI
-      #   uses: pypa/gh-action-pypi-publish@master
-      #   with:
-      #     user: ${{ secrets.pypi_user }}
-      #     password: ${{ secrets.pypi_password }}
-      #     repository_url: https://test.pypi.org/legacy/
-      #     skip_existing: true
-
-      # - name: Install Package
-      #   run: pip install tflite-runtime-alt  # XXX: how to get version???
-      # - name: Tests
-      #   run: python test/test.py
+          docker run --rm -v dist:dist \
+            -e TF_BRANCH=${{ matrix.branch }} \
+            -e PKG_NAME=${{ matrix.package_name }} \
+            -e VERSION_SUFFIX=${{ matrix.version_suffix }} \
+            -e TWINE_USERNAME=${{ secrets.pypi_user }} \
+            -e TWINE_PASSWORD=${{ secrets.pypi_password }} \
+            tflite_runtime_arm_build run_full_tflite_build

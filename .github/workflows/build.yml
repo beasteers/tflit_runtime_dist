@@ -14,22 +14,23 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        branch: [master]
+        branch: [r2.1, r2.2, r2.3, master]
         python: [3.7]
         os: [ubuntu-latest]
         # branch: [r2.1, r2.2, r2.3]  # r2.1,
         # python: [3.5, 3.6, 3.7, 3.8] #
         # os: [macos-latest, ubuntu-latest]  #
         version_suffix: [.dev800]
+        package_name: [tflite-runtime-alt]
 
     steps:
 
       # Setup
 
-      - uses: actions/checkout@master
-      - uses: actions/setup-python@v1
-        with:
-          python-version: ${{ matrix.python }}
+      # - uses: actions/checkout@master
+      # - uses: actions/setup-python@v1
+      #   with:
+      #     python-version: ${{ matrix.python }}
 
       - name: Clone
         run: |
@@ -38,63 +39,68 @@ jobs:
 
       # install
 
-      - name: Platform Installs | Linux
-        if: startsWith(matrix.os, 'ubuntu')
-        run: sudo apt-get install swig libjpeg-dev zlib1g-dev -y
-
-      - name: Platform Installs | Mac
-        if: startsWith(matrix.os, 'macos')
-        run: brew install swig libjpeg
-
-      - name: Installs
-        run: pip install numpy pybind11 wheel
+      # - name: Platform Installs | Linux
+      #   if: startsWith(matrix.os, 'ubuntu')
+      #   run: sudo apt-get install swig libjpeg-dev zlib1g-dev -y
+      #
+      # - name: Platform Installs | Mac
+      #   if: startsWith(matrix.os, 'macos')
+      #   run: brew install swig libjpeg
+      #
+      # - name: Installs
+      #   run: pip install numpy pybind11 wheel
 
       # build
 
       - name: Build
         run: |
-          /bin/bash ../tensorflow/tensorflow/lite/tools/make/download_dependencies.sh
-          /bin/bash ../tensorflow/tensorflow/lite/tools/pip_package/build_pip_package.sh
-        env:
-          VERSION_SUFFIX: ${{ matrix.version_suffix }}
-
-      # gather files
-
-      - name: copy over wheels
-        run: |
-          pwd
-          FILES=$(find /tmp/tflite_pip ../tensorflow/tensorflow/lite -name "tflite_runtime*.whl" 2>/dev/null || :)
-          echo 'Found:' $FILES
-
-          mkdir -p dist
-          for f in $FILES; do
-            f2=dist/$(basename "$f" | sed -e 's/linux/manylinux2014/g')
-            mv "$f" "$f2"
-          done
-
-          ls -lah
-          ls -lah dist/
-
-      # push github
-      - name: commit files
-        run: |
-          git config --global user.email "bea.steers@gmail.com"
-          git config --global user.name "Bea Steers"
-          git add dist/
-          git commit -m 'adding whl for ${{ matrix.os }}:${{ matrix.python }}'
-
-          #  https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${REPOSITORY}.git
-          for i in {1..5}; do
-             git pull && git push && break
-             sleep $((1 + $RANDOM % 4))
-          done
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Publish package to TestPyPI
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          user: ${{ secrets.pypi_user }}
-          password: ${{ secrets.pypi_password }}
-          repository_url: https://test.pypi.org/legacy/
-          skip_existing: true
+          # change
+          sed -i -e "s/PACKAGE_NAME\s*=\s*['"]tflite[_-]runtime['"]/PACKAGE_NAME = \"${PKG_NAME}\"/" \
+            ../tensorflow/tensorflow/lite/tools/pip_package/setup.py
+          cat   ../tensorflow/tensorflow/lite/tools/pip_package/setup.py
+      #     /bin/bash ../tensorflow/tensorflow/lite/tools/make/download_dependencies.sh
+      #     /bin/bash ../tensorflow/tensorflow/lite/tools/pip_package/build_pip_package.sh
+      #   env:
+      #     VERSION_SUFFIX: ${{ matrix.version_suffix }}
+      #     PKG_NAME: ${{ matrix.package_name }}
+      #
+      # # gather files
+      #
+      # - name: copy over wheels
+      #   run: |
+      #     pwd
+      #     FILES=$(find /tmp/tflite_pip ../tensorflow/tensorflow/lite -name "tflite_runtime*.whl" 2>/dev/null || :)
+      #     echo 'Found:' $FILES
+      #
+      #     mkdir -p dist
+      #     for f in $FILES; do
+      #       f2=dist/$(basename "$f" | sed -e 's/linux/manylinux2014/g')
+      #       mv "$f" "$f2"
+      #     done
+      #
+      #     ls -lah
+      #     ls -lah dist/
+      #
+      # # push github
+      # - name: commit files
+      #   run: |
+      #     git config --global user.email "bea.steers@gmail.com"
+      #     git config --global user.name "Bea Steers"
+      #     git add dist/
+      #     git commit -m 'adding whl for ${{ matrix.os }}:${{ matrix.python }}'
+      #
+      #     #  https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${REPOSITORY}.git
+      #     for i in {1..5}; do
+      #        git pull && git push && break
+      #        sleep $((1 + $RANDOM % 4))
+      #     done
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #
+      # - name: Publish package to TestPyPI
+      #   uses: pypa/gh-action-pypi-publish@master
+      #   with:
+      #     user: ${{ secrets.pypi_user }}
+      #     password: ${{ secrets.pypi_password }}
+      #     repository_url: https://test.pypi.org/legacy/
+      #     skip_existing: true

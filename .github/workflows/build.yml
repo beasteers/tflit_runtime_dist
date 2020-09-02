@@ -85,7 +85,9 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Make ${{ matrix.arch }} wheel
-        run: . .ci/build_steps.sh && run_full_tflite_build
+        run: |
+          sudo apt-get install g++-arm-linux-gnueabihf
+          . .ci/build_steps.sh && run_full_tflite_build
         env:
           TENSORFLOW_TARGET: ${{ matrix.arch }}
           VERSION_SUFFIX: ${{ matrix.version_suffix }}

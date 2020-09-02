@@ -10,14 +10,13 @@ TFDIR=../tensorflow
 TFLITEDIR=$TFDIR/tensorflow/lite/tools
 
 clone_tensorflow() {
-    if [ ! -d $TFDIR ]
-    then
+    if [ ! -d $TFDIR ]; then
         git clone https://github.com/tensorflow/tensorflow.git $TFDIR
         git -C $TFDIR checkout $TF_BRANCH
     else
         git -C $TFDIR checkout $TF_BRANCH
         git -C $TFDIR pull
-    done
+    fi
 }
 # install
 
@@ -26,7 +25,7 @@ install_tflite_build_deps() {
         sudo apt-get install swig libjpeg-dev zlib1g-dev -y
     else
         brew install swig libjpeg
-    done
+    fi
     pip install numpy pybind11 wheel
 }
 # build

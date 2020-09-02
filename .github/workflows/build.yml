@@ -55,7 +55,7 @@ jobs:
       - name: Build
         run: |
           # change
-          sed -i -e "s/PACKAGE_NAME\s*=\s*['"]tflite[_-]runtime['"]/PACKAGE_NAME = \"${PKG_NAME}\"/" \
+          sed -i -e "s/PACKAGE_NAME = [\'\"]tflite[_-]runtime[\'\"]/PACKAGE_NAME = \"${PKG_NAME}\"/" \
             ../tensorflow/tensorflow/lite/tools/pip_package/setup.py
           cat   ../tensorflow/tensorflow/lite/tools/pip_package/setup.py
       #     /bin/bash ../tensorflow/tensorflow/lite/tools/make/download_dependencies.sh

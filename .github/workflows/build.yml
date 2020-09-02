@@ -73,8 +73,8 @@ jobs:
     name: Build ARM 32/64
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:  # how to DRY?
-        fail-fast: false
         branch: [master]
         python: [3.7]
         # branch: [r2.1, r2.2, r2.3]  # r2.1,
@@ -91,7 +91,12 @@ jobs:
 
       - name: Make ${{ matrix.arch }} wheel
         run: |
-          sudo apt-get install g++-arm-linux-gnueabihf g++-aarch64-linux-gnu
+          if [ "${{ matrix.arch }}" -eq "aarch64" ]; then
+            sudo apt-get install g++-aarch64-linux-gnu
+          else
+            sudo apt-get install g++-arm-linux-gnueabihf 
+          fi
+
           . .ci/build_steps.sh && run_full_tflite_build
         env:
           TENSORFLOW_TARGET: ${{ matrix.arch }}

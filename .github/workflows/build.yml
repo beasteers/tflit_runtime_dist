@@ -99,13 +99,22 @@ jobs:
       #   env:
       #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Publish package to TestPyPI
-        uses: pypa/gh-action-pypi-publish@master
-        with:
-          user: ${{ secrets.pypi_user }}
-          password: ${{ secrets.pypi_password }}
-          repository_url: https://test.pypi.org/legacy/
-          skip_existing: true
+      - name: pypi upload
+        run: |
+          pip install twine
+          twine check dist/*
+          twine upload --skip-existing --repository testpypi dist/*
+        env:
+          TWINE_USERNAME: ${{ secrets.pypi_user }}
+          TWINE_PASSWORD: ${{ secrets.pypi_password }}
+
+      # - name: Publish package to TestPyPI
+      #   uses: pypa/gh-action-pypi-publish@master
+      #   with:
+      #     user: ${{ secrets.pypi_user }}
+      #     password: ${{ secrets.pypi_password }}
+      #     repository_url: https://test.pypi.org/legacy/
+      #     skip_existing: true
 
       # - name: Install Package
       #   run: pip install tflite-runtime-alt  # XXX: how to get version???

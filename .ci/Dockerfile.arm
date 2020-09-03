@@ -4,7 +4,7 @@ FROM $image
 RUN [ "cross-build-start" ]
 
 WORKDIR /src/tflite_runtime
-COPY .ci/build_steps.sh .
+COPY .ci/build_steps.sh ./build_steps.sh
 RUN . build_steps.sh && clone_tensorflow && install_tflite_build_deps
 RUN . build_steps.sh && build_tflite_runtime && gather_tflite_wheels
 RUN . build_steps.sh && upload_to_testpypi

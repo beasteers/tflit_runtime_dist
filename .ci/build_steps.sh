@@ -47,22 +47,22 @@ build_tflite_runtime() {
     sed -i -e "s/  name=PACKAGE_NAME/  name=\"${PKG_NAME}\"/" \
         $TFLITEDIR/pip_package/setup.py
 
-    . $TFLITEDIR/make/download_dependencies.sh && . $TFLITEDIR/pip_package/build_pip_package.sh
+    # . $TFLITEDIR/make/download_dependencies.sh && . $TFLITEDIR/pip_package/build_pip_package.sh
+    touch $TFLITEDIR/pip_package/python3/tflite_runtime_alt-2.3-asdf-asdf-.whl
 }
 
 
 # gather files
 
 gather_tflite_wheels() {
-    # FILES=$(find /tmp/tflite_pip $TFLITEDIR -name "tflite_runtime*.whl" 2>/dev/null || :)
-    # echo 'Found:' $FILES
-    #
-    # mkdir -p dist
-    # for f in $FILES; do
-    #   f2=dist/$(basename "$f" | sed -e 's/linux/manylinux2014/g')
-    #   mv "$f" "$f2"
-    # done
-    touch $TFLITEDIR/pip_package/python3/tflite_runtime_alt-2.3-asdf-asdf-.whl
+    FILES=$(find /tmp/tflite_pip $TFLITEDIR -name "tflite_runtime*.whl" 2>/dev/null || :)
+    echo 'Found:' $FILES
+
+    mkdir -p dist
+    for f in $FILES; do
+      f2=dist/$(basename "$f" | sed -e 's/linux/manylinux2014/g')
+      mv "$f" "$f2"
+    done
 
     ls -lah
     ls -lah dist/

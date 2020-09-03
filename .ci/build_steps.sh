@@ -34,8 +34,7 @@ build_tflite_runtime() {
     sed -i -e "s/  name=PACKAGE_NAME/  name=\"${PKG_NAME}\"/" \
         $TFLITEDIR/pip_package/setup.py
 
-    /bin/bash $TFLITEDIR/make/download_dependencies.sh
-    /bin/bash $TFLITEDIR/pip_package/build_pip_package.sh
+    . $TFLITEDIR/make/download_dependencies.sh && . $TFLITEDIR/pip_package/build_pip_package.sh
 }
 
 

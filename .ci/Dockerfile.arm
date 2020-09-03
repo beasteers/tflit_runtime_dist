@@ -1,8 +1,14 @@
-ARG arch=arm32v7
-ARG py_version=3.7
-FROM $arch/python:$py_version
+ARG image=balenalib/raspberrypi3-python:3.7
+FROM $image
+
+RUN [ "cross-build-start" ]
 
 WORKDIR /src/tflite_runtime
 COPY .ci/build_steps.sh .
-RUN . build_steps.sh && clone_tensorflow
-ENTRYPOINT ['bash', '-c', '. build_steps.sh && "$@"']
+RUN . build_steps.sh && clone_tensorflow && install_tflite_build_deps
+RUN . build_steps.sh && build_tflite_runtime && gather_tflite_wheels
+RUN . build_steps.sh && upload_to_testpypi
+
+# ENTRYPOINT ['bash', '-c', '. build_steps.sh && "$@"']
+
+RUN [ "cross-build-end" ]

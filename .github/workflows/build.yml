@@ -89,17 +89,39 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
+      # - name: Make ${{ matrix.arch }} wheel
+      #   run: |
+      #     if [ "$ARCH" -eq "aarch64" ]; then
+      #       sudo apt-get install g++-aarch64-linux-gnu
+      #     else
+      #       sudo apt-get install g++-arm-linux-gnueabihf
+      #     fi
+      #
+      #     . .ci/build_steps.sh && run_full_tflite_build
+      #   env:
+      #     ARCH: ${{ matrix.arch }}
+      #     TENSORFLOW_TARGET: ${{ matrix.arch }}
+      #     VERSION_SUFFIX: ${{ matrix.version_suffix }}
+      #     PKG_NAME: ${{ matrix.package_name }}
+      #     TWINE_USERNAME: ${{ secrets.pypi_user }}
+      #     TWINE_PASSWORD: ${{ secrets.pypi_password }}
+
       - name: Make ${{ matrix.arch }} wheel
         run: |
           if [ "$ARCH" -eq "aarch64" ]; then
-            sudo apt-get install g++-aarch64-linux-gnu
+            IMAGE="balenalib/generic-aarch64-python:${PY_VERSION}"
           else
-            sudo apt-get install g++-arm-linux-gnueabihf
+            IMAGE="balenalib/raspberrypi3-python:${PY_VERSION}"
           fi
 
-          . .ci/build_steps.sh && run_full_tflite_build
+          TAG="tflite-runtime-build-${ARCH}-${PY_VERSION}"
+          docker build -f .ci/Dockerfile.arm -t $TAG --build-arg image=$IMAGE .
+
+          docker cp "$(docker create $TAG)":dist/ dist/
+          ls dist/
         env:
           ARCH: ${{ matrix.arch }}
+          PY_VERSION: ${{ matrix.python }}
           TENSORFLOW_TARGET: ${{ matrix.arch }}
           VERSION_SUFFIX: ${{ matrix.version_suffix }}
           PKG_NAME: ${{ matrix.package_name }}

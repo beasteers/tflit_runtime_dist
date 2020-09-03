@@ -69,6 +69,7 @@ jobs:
   #     #     TFRUNTIME_VERSION:   # XXX: how to get version???
 
 
+  # useful: https://github.com/kivy/kivy/pull/6568
   build_arm:
     name: Build ARM 32/64
     runs-on: ubuntu-latest

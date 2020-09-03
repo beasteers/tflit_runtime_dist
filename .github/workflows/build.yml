@@ -108,7 +108,7 @@ jobs:
 
       - name: Make ${{ matrix.arch }} wheel
         run: |
-          if [ "$ARCH" -eq "aarch64" ]; then
+          if [ "${ARCH}" = "aarch64" ]; then
             IMAGE="balenalib/generic-aarch64-python:${PY_VERSION}"
           else
             IMAGE="balenalib/raspberrypi3-python:${PY_VERSION}"

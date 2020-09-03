@@ -91,14 +91,15 @@ jobs:
 
       - name: Make ${{ matrix.arch }} wheel
         run: |
-          if [ "${{ matrix.arch }}" -eq "aarch64" ]; then
+          if [ "$ARCH" -eq "aarch64" ]; then
             sudo apt-get install g++-aarch64-linux-gnu
           else
-            sudo apt-get install g++-arm-linux-gnueabihf 
+            sudo apt-get install g++-arm-linux-gnueabihf
           fi
 
           . .ci/build_steps.sh && run_full_tflite_build
         env:
+          ARCH: ${{ matrix.arch }}
           TENSORFLOW_TARGET: ${{ matrix.arch }}
           VERSION_SUFFIX: ${{ matrix.version_suffix }}
           PKG_NAME: ${{ matrix.package_name }}

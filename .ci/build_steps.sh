@@ -6,7 +6,7 @@
 
 # clone tensorflow
 
-TFDIR=tensorflow
+TFDIR=../tensorflow
 TFLITEDIR=$TFDIR/tensorflow/lite/tools
 
 # REPO_DIR=tflite_runtime_dist
@@ -48,7 +48,9 @@ build_tflite_runtime() {
         $TFLITEDIR/pip_package/setup.py
 
     # . $TFLITEDIR/make/download_dependencies.sh && . $TFLITEDIR/pip_package/build_pip_package.sh
-    touch $TFLITEDIR/pip_package/python3/tflite_runtime_alt-2.3-asdf-asdf-.whl
+    d=$TFLITEDIR/pip_package/python3
+    mkdir -p $d
+    touch $d/tflite_runtime_alt-2.3-asdf-asdf-.whl
 }
 
 

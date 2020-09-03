@@ -6,8 +6,10 @@
 
 # clone tensorflow
 
-TFDIR=../tensorflow
+TFDIR=tensorflow
 TFLITEDIR=$TFDIR/tensorflow/lite/tools
+
+# REPO_DIR=tflite_runtime_dist
 
 clone_tensorflow() {
     if [ ! -d $TFDIR ]; then
@@ -18,6 +20,17 @@ clone_tensorflow() {
         git -C $TFDIR pull
     fi
 }
+
+# clone_this_repo() {
+#     if [ ! -d $TFDIR ]; then
+#         git clone https://github.com/beasteers/tflite_runtime_alt.git $REPO_DIR
+#         git -C $TFDIR checkout $TF_BRANCH
+#     else
+#         git -C $TFDIR checkout $TF_BRANCH
+#         git -C $TFDIR pull
+#     fi
+# }
+
 # install
 
 install_tflite_build_deps() {
@@ -41,14 +54,15 @@ build_tflite_runtime() {
 # gather files
 
 gather_tflite_wheels() {
-    FILES=$(find /tmp/tflite_pip $TFLITEDIR -name "tflite_runtime*.whl" 2>/dev/null || :)
-    echo 'Found:' $FILES
-
-    mkdir -p dist
-    for f in $FILES; do
-      f2=dist/$(basename "$f" | sed -e 's/linux/manylinux2014/g')
-      mv "$f" "$f2"
-    done
+    # FILES=$(find /tmp/tflite_pip $TFLITEDIR -name "tflite_runtime*.whl" 2>/dev/null || :)
+    # echo 'Found:' $FILES
+    #
+    # mkdir -p dist
+    # for f in $FILES; do
+    #   f2=dist/$(basename "$f" | sed -e 's/linux/manylinux2014/g')
+    #   mv "$f" "$f2"
+    # done
+    touch $TFLITEDIR/pip_package/python3/tflite_runtime_alt-2.3-asdf-asdf-.whl
 
     ls -lah
     ls -lah dist/
@@ -56,18 +70,18 @@ gather_tflite_wheels() {
 
 # pypi
 
-# push_wheels_to_github() {
-#     git config --global user.email "bea.steers@gmail.com"
-#     git config --global user.name "Bea Steers"
-#     git add dist/
-#     git commit -m 'adding whl for $OS_NAME:$PY_VERSION'
-#
-#     #  https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${REPOSITORY}.git
-#     for i in {1..5}; do
-#        git pull && git push && break
-#        sleep $((1 + $RANDOM % 4))
-#     done
-# }
+push_wheels_to_github() {
+    git config --global user.email "bea.steers@gmail.com"
+    git config --global user.name "Bea Steers"
+    git add dist/
+    git commit -m 'adding whl for $OS_NAME:$PY_VERSION'
+
+    #  https://${GITHUB_ACTOR}:${GITHUB_TOKEN}@github.com/${REPOSITORY}.git
+    for i in {1..5}; do
+       git pull && git push && break
+       sleep $((1 + $RANDOM % 4))
+    done
+}
 
 upload_to_pypi() {
     pip install twine && twine check dist/* && twine upload --skip-existing dist/*

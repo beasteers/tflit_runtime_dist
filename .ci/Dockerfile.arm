@@ -10,7 +10,11 @@ COPY .ci/build_steps.sh ./build_steps.sh
 RUN pip config set global.extra-index-url https://www.piwheels.org/simple
 RUN /bin/bash -c ". ./build_steps.sh && clone_tensorflow && install_tflite_build_deps"
 RUN /bin/bash -c ". ./build_steps.sh && build_tflite_runtime && gather_tflite_wheels"
+RUN pwd && ls -lah
+RUN ls -lah ../tensorflow/tensorflow/lite/tools/pip_package/gen/tflite_pip/
+RUN ls -lah dist/
 RUN /bin/bash -c ". ./build_steps.sh && upload_to_testpypi"
+RUN echo
 
 # ENTRYPOINT ['bash', '-c', '. ./build_steps.sh && "$@"']
 

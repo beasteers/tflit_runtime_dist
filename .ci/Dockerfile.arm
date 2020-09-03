@@ -3,7 +3,7 @@ FROM $image
 
 RUN [ "cross-build-start" ]
 
-RUN apt-get update && apt-get install -y git build-essential libatlas-base-dev unzip
+RUN apt-get update && apt-get install -y git build-essential libatlas-base-dev unzip libffi-dev
 
 WORKDIR /src/tflite_runtime
 COPY .ci/build_steps.sh ./build_steps.sh

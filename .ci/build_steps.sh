@@ -26,7 +26,7 @@ install_tflite_build_deps() {
     else
         brew install swig libjpeg
     fi
-    pip install numpy pybind11 wheel setuptools --upgrade
+    pip install -U pip numpy pybind11 wheel setuptools
 }
 # build
 
@@ -70,15 +70,11 @@ gather_tflite_wheels() {
 # }
 
 upload_to_pypi() {
-    pip install twine
-    twine check dist/*
-    twine upload --skip-existing dist/*
+    pip install twine && twine check dist/* && twine upload --skip-existing dist/*
 }
 
 upload_to_testpypi() {
-    pip install twine
-    twine check dist/*
-    twine upload --skip-existing --repository testpypi dist/*
+    pip install twine && twine check dist/* && twine upload --skip-existing --repository testpypi dist/*
 }
 
 
@@ -86,8 +82,7 @@ upload_to_testpypi() {
 
 
 test_tflite_runtime() {
-    pip install tflite-runtime-alt==$TFRUNTIME_VERSION
-    python test/test.py
+    pip install tflite-runtime-alt==$TFRUNTIME_VERSION && python test/test.py
 }
 
 

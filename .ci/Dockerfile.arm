@@ -7,9 +7,9 @@ RUN apt-get update && apt-get install -y git build-essential
 
 WORKDIR /src/tflite_runtime
 COPY .ci/build_steps.sh ./build_steps.sh
-RUN . ./build_steps.sh && clone_tensorflow && install_tflite_build_deps
-RUN . ./build_steps.sh && build_tflite_runtime && gather_tflite_wheels
-RUN . ./build_steps.sh && upload_to_testpypi
+RUN /bin/bash . ./build_steps.sh && clone_tensorflow && install_tflite_build_deps
+RUN /bin/bash . ./build_steps.sh && build_tflite_runtime && gather_tflite_wheels
+RUN /bin/bash . ./build_steps.sh && upload_to_testpypi
 
 # ENTRYPOINT ['bash', '-c', '. ./build_steps.sh && "$@"']
 

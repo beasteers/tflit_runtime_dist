@@ -86,9 +86,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-python@v1
-        with:
-          python-version: ${{ matrix.python }}
+      # - uses: actions/setup-python@v1
+      #   with:
+      #     python-version: ${{ matrix.python }}
 
       # - name: Make ${{ matrix.arch }} wheel
       #   run: |

@@ -48,9 +48,9 @@ build_tflite_runtime() {
         $TFLITEDIR/pip_package/setup.py
 
     # . $TFLITEDIR/make/download_dependencies.sh && . $TFLITEDIR/pip_package/build_pip_package.sh
-    d=$TFLITEDIR/pip_package/python3
+    d=$TFLITEDIR/pip_package/gen/tflite_pip/python3
     mkdir -p $d
-    touch $d/tflite_runtime_alt-2.3-asdf-asdf-.whl
+    touch $d/tflite_runtime_alt-2.3-asdf-asdf-33fsf.whl
 }
 
 
